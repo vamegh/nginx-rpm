@@ -1,21 +1,7 @@
-= How build rpm and src.rpm from spec file:
-	
-* make
+Nginx RPM spec file and sources for RHEL/CentOS etc.
 
-= How commit changes to git repo
+The additional module for PAM authentication (ngx_http_auth_pam_module) has been added.
 
-	1. git commit -a
-	2. git push 
+Build requirements:
 
-= Pack with you own passenger
-You can build RPM with nginx with your own version passenger.
-Only thing you need is change ree_dir and passenger version in nginx-passenger.spec
-and edit nginx.conf after install (or update nginx-passenger-conf.patch)
-
-Enjoy passenger without apache!
-
-= About tools-nginx
-nginx+passenger - is a part of our global project sliceconfig ( http://github.com/fs/sliceconfig ).
-Sliceconfig is a very useful scripts which allow quick and easy setup new server with mysql, 
-passenger, and apache or nginx. It also installed vsftpd, iptables and so on, but you better look
-at sliceconfig on github project page
+yum install rpm-build pcre-devel pam-devel zlib-devel openssl-devel

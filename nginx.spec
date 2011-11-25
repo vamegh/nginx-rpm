@@ -8,7 +8,7 @@
 %define nginx_webroot   %{nginx_datadir}/html
 
 Name:           nginx
-Version:        0.6.36
+Version:        1.0.10
 Release:        1
 Summary:        Robust, small and high performance http and reverse proxy server
 Group:          System Environment/Daemons   
@@ -18,7 +18,7 @@ Group:          System Environment/Daemons
 License:        BSD
 URL:            http://nginx.net/ 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
-BuildRequires:      pcre-devel,zlib-devel,openssl-devel,perl(ExtUtils::Embed)
+BuildRequires:      pcre-devel,zlib-devel,openssl-devel,perl(ExtUtils::Embed),pam-devel
 Requires:           pcre,zlib,openssl
 Requires:           perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 # for /user/sbin/useradd
@@ -31,7 +31,7 @@ Requires(postun):   initscripts
 Source0:    http://sysoev.ru/nginx/nginx-%{version}.tar.gz
 Source1:    %{name}.init
 Source2:    %{name}.logrotate
-Source5:    nginx-upstream-fair.tgz
+Source5:	ngx_http_auth_pam_module-1.2.tar.gz
 Source7:    %{name}.sysconfig
 Source100:  index.html
 Source102:  nginx-logo.png
@@ -56,14 +56,13 @@ Patch1:     nginx-auto-options.patch
 Nginx [engine x] is an HTTP(S) server, HTTP(S) reverse proxy and IMAP/POP3
 proxy server written by Igor Sysoev.
 
-One third party module, nginx-upstream-fair has been added.
+One third party module, ngx_http_auth_pam has been added.
 
 %prep
 %setup -q
 
 %patch0 -p0
 %patch1 -p0
-#%patch2 -p0
 %{__tar} zxvf %{SOURCE5}
 
 %build
@@ -95,7 +94,6 @@ export DESTDIR=%{buildroot}
     --without-select_module             \
     --without-poll_module               \
     --without-http_charset_module       \
-    --without-http_userid_module        \
     --without-http_autoindex_module    \
     --without-http_geo_module          \
     --without-http_map_module          \
@@ -105,14 +103,10 @@ export DESTDIR=%{buildroot}
     --without-http_browser_module      \
     --without-mail_imap_module         \
     --without-mail_smtp_module         \
-    --with-cc-opt="%{optflags} $(pcre-config --cflags)" \
-    --add-module=%{_builddir}/nginx-%{version}/nginx-upstream-fair
+    --add-module=%{_builddir}/nginx-%{version}/ngx_http_auth_pam_module-1.2
+    #--with-cc-opt="%{optflags} $(pcre-config --cflags)" \
 
 make %{?_smp_mflags} 
-
-# rename the readme for nginx-upstream-fair so it doesn't conflict with the main
-# readme
-mv nginx-upstream-fair/README nginx-upstream-fair/README.nginx-upstream-fair
 
 %install
 rm -rf %{buildroot}
@@ -123,6 +117,7 @@ find %{buildroot} -type f -empty -exec rm -f {} \;
 find %{buildroot} -type f -exec chmod 0644 {} \;
 find %{buildroot} -type f -name '*.so' -exec chmod 0755 {} \;
 chmod 0755 %{buildroot}%{_sbindir}/nginx
+mkdir %{buildroot}%{nginx_confdir}/conf.d
 %{__install} -p -D -m 0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
 %{__install} -p -D -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 %{__install} -p -D -m 0644 %{SOURCE7} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
@@ -165,20 +160,26 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc LICENSE CHANGES README nginx-upstream-fair/README.nginx-upstream-fair
+%doc LICENSE CHANGES README
 %dir %{nginx_datadir}
 %{_datadir}/%{name}/*/*
 %{_sbindir}/%{name}
 #%{_mandir}/man3/%{name}.3pm.gz
 %{_initrddir}/%{name}
 %dir %{nginx_confdir}
+%dir %{nginx_confdir}/conf.d
 %config(noreplace) %{nginx_confdir}/win-utf
 %config(noreplace) %{nginx_confdir}/bots.conf
 %config(noreplace) %{nginx_confdir}/fastcgi_params
 %config(noreplace) %{nginx_confdir}/fastcgi_params.default
 %config(noreplace) %{nginx_confdir}/mime.types.default
 %config(noreplace) %{nginx_confdir}/nginx.conf.default
-
+%config(noreplace) %{nginx_confdir}/fastcgi.conf
+%config(noreplace) %{nginx_confdir}/fastcgi.conf.default
+%config(noreplace) %{nginx_confdir}/scgi_params
+%config(noreplace) %{nginx_confdir}/scgi_params.default
+%config(noreplace) %{nginx_confdir}/uwsgi_params
+%config(noreplace) %{nginx_confdir}/uwsgi_params.default
 %config(noreplace) %{nginx_confdir}/status.conf
 %config(noreplace) %{nginx_confdir}/koi-win
 %config(noreplace) %{nginx_confdir}/koi-utf
