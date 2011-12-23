@@ -8,7 +8,7 @@
 %define nginx_webroot   %{nginx_datadir}/html
 
 Name:           nginx
-Version:        1.0.10
+Version:        1.0.11
 Release:        1
 Summary:        Robust, small and high performance http and reverse proxy server
 Group:          System Environment/Daemons   
