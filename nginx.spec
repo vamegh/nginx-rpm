@@ -8,7 +8,7 @@
 %define nginx_webroot   %{nginx_datadir}/html
 
 Name:           nginx
-Version:        1.0.11
+Version:        1.15.3
 Release:        1
 Summary:        Robust, small and high performance http and reverse proxy server
 Group:          System Environment/Daemons   
@@ -31,7 +31,7 @@ Requires(postun):   initscripts
 Source0:    http://sysoev.ru/nginx/nginx-%{version}.tar.gz
 Source1:    %{name}.init
 Source2:    %{name}.logrotate
-Source5:	ngx_http_auth_pam_module-1.2.tar.gz
+Source5:	ngx_http_auth_pam_module-1.5.1.tar.gz
 Source7:    %{name}.sysconfig
 Source100:  index.html
 Source102:  nginx-logo.png
@@ -98,12 +98,11 @@ export DESTDIR=%{buildroot}
     --without-http_geo_module          \
     --without-http_map_module          \
     --without-http_referer_module      \
-    --without-http_limit_zone_module   \
     --without-http_empty_gif_module    \
     --without-http_browser_module      \
     --without-mail_imap_module         \
     --without-mail_smtp_module         \
-    --add-module=%{_builddir}/nginx-%{version}/ngx_http_auth_pam_module-1.2
+    --add-module=%{_builddir}/nginx-%{version}/ngx_http_auth_pam_module-1.5.1
     #--with-cc-opt="%{optflags} $(pcre-config --cflags)" \
 
 make %{?_smp_mflags} 
